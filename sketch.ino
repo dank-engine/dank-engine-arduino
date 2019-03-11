@@ -132,7 +132,10 @@ void readSerial() {
             if (rc != MESSAGE_END) {
                 buffer[index++] = rc;
                 if (index >= BUFFER_SIZE - 1) {
-                    index -= 1;
+                    buffer[index] = '\0';
+                    read_state = false;
+                    new_data = true;
+                    index = 0;
                 }
             } else {
                 buffer[index] = '\0';
