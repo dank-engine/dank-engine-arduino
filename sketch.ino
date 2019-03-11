@@ -75,7 +75,7 @@ void processBuffer() {
         char* command = strtok(temp, ";");
         while (command != NULL) {
             uint32_t color;
-            if (sscanf(command, "%d,%d,%ld,%d", &message.type, &message.id, &color, &message.percentage) == 4) {
+            if (sscanf(command, "%d,%u,%lu,%u", &message.type, &message.id, &color, &message.percentage) == 4) {
                 Serial.println(command); // Returns command as expected.
                 Serial.println(message.type); // Does not return message.type properly.
                 
