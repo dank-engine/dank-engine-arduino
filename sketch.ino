@@ -1,8 +1,5 @@
 #include <FastLED.h>
-#include <SPI.h>
-#include <Wire.h>
-
-#define BUFFER_SIZE 128
+#define BUFFER_SIZE 512
 #define NUM_LEDS 50
 #define MESSAGE_START '!'
 #define MESSAGE_END '$'
@@ -33,56 +30,20 @@ struct Message {
 };
 
 void processBuffer() {
-/*
-                       uuuuuuu
-                  uu$$$$$$$$$$$uu
-               uu$$$$$$$$$$$$$$$$$uu
-              u$$$$$$$$$$$$$$$$$$$$$u
-             u$$$$$$$$$$$$$$$$$$$$$$$u
-            u$$$$$$$$$$$$$$$$$$$$$$$$$u
-            u$$$$$$$$$$$$$$$$$$$$$$$$$u
-            u$$$$$$"   "$$$"   "$$$$$$u
-            "$$$$"      u$u       $$$$"
-             $$$u       u$u       u$$$
-             $$$u      u$$$u      u$$$
-              "$$$$uu$$$   $$$uu$$$$"
-               "$$$$$$$"   "$$$$$$$"
-                 u$$$$$$$u$$$$$$$u
-                  u$"$"$"$"$"$"$u
-       uuu        $$u$ $ $ $ $u$$       uuu
-      u$$$$        $$$$$u$u$u$$$       u$$$$
-       $$$$$uu      "$$$$$$$$$"     uu$$$$$$
-     u$$$$$$$$$$$uu    """""    uuuu$$$$$$$$$$
-     $$$$"""$$$$$$$$$$uuu   uu$$$$$$$$$"""$$$"
-      """      ""$$$$$$$$$$$uu ""$"""
-                uuuu ""$$$$$$$$$$uuu
-       u$$$uuu$$$$$$$$$uu ""$$$$$$$$$$$uuu$$$
-       $$$$$$$$$$""""           ""$$$$$$$$$$$"
-        "$$$$$"                      ""$$$$""
-          $$$"                         $$$$"
-
-                      WARNING
-   This method is cursed. Debug at your own risk.
-*/
     int flash = beatsin16(FLASH_PERIOD, 0, 255); // precompute sin value for flash.
 
     if (new_data) {
-        char temp[BUFFER_SIZE];
-        strncpy(temp, buffer, BUFFER_SIZE);
         struct Message message;
 
         // Tokenize the string so we can parse sections of "TYPE,ID,COLOR,PERCENTAGE;"
-        char* command = strtok(temp, ";");
+        char* command = strtok(buffer, ";");
         while (command != NULL) {
             uint32_t color;
-            if (sscanf(command, "%d,%u,%lu,%u", &message.type, &message.id, &color, &message.percentage) == 4) {
-                Serial.println(command); // Returns command as expected.
-                Serial.println(message.type); // Does not return message.type properly.
-                
-                
+            // ty @mon :^)
+            if (sscanf(command, "%d,%hhu,%lu,%hhu", &message.type, &message.id, &color, &message.percentage) == 4) {
                 message.color = CRGB(color); // being careful...
                 if (message.type == FLASH) {
-                    message.percentage = flash;
+                    message.percentage = 255;
                 }
 
                 processMessage(&message);
@@ -108,13 +69,13 @@ void processMessage(Message* message) {
         case FADE:
             leds[message->id] = message->color;
             leds[message->id].fadeLightBy(message->percentage);
-            Serial.println("[State] FADE -> led id: ");
+            Serial.print("[State] FADE -> led id: ");
             Serial.println(message->id);
             break;
         case FLASH:
             leds[message->id] = message->color;
             // CRGB addition with FastLED does NOT overflow
-            Serial.println("[State] FLASH -> led id: ");
+            Serial.print("[State] FLASH -> led id: ");
             leds[message->id] += CRGB(message->percentage, message->percentage, message->percentage); 
             Serial.println(message->id);
             break;
