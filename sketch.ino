@@ -33,7 +33,37 @@ struct Message {
 };
 
 void processBuffer() {
-    // WARNING: This method is cursed. Debug at your own risk.
+/*
+                       uuuuuuu
+                  uu$$$$$$$$$$$uu
+               uu$$$$$$$$$$$$$$$$$uu
+              u$$$$$$$$$$$$$$$$$$$$$u
+             u$$$$$$$$$$$$$$$$$$$$$$$u
+            u$$$$$$$$$$$$$$$$$$$$$$$$$u
+            u$$$$$$$$$$$$$$$$$$$$$$$$$u
+            u$$$$$$"   "$$$"   "$$$$$$u
+            "$$$$"      u$u       $$$$"
+             $$$u       u$u       u$$$
+             $$$u      u$$$u      u$$$
+              "$$$$uu$$$   $$$uu$$$$"
+               "$$$$$$$"   "$$$$$$$"
+                 u$$$$$$$u$$$$$$$u
+                  u$"$"$"$"$"$"$u
+       uuu        $$u$ $ $ $ $u$$       uuu
+      u$$$$        $$$$$u$u$u$$$       u$$$$
+       $$$$$uu      "$$$$$$$$$"     uu$$$$$$
+     u$$$$$$$$$$$uu    """""    uuuu$$$$$$$$$$
+     $$$$"""$$$$$$$$$$uuu   uu$$$$$$$$$"""$$$"
+      """      ""$$$$$$$$$$$uu ""$"""
+                uuuu ""$$$$$$$$$$uuu
+       u$$$uuu$$$$$$$$$uu ""$$$$$$$$$$$uuu$$$
+       $$$$$$$$$$""""           ""$$$$$$$$$$$"
+        "$$$$$"                      ""$$$$""
+          $$$"                         $$$$"
+
+                      WARNING
+   This method is cursed. Debug at your own risk.
+*/
     int flash = beatsin16(FLASH_PERIOD, 0, 255); // precompute sin value for flash.
 
     if (new_data) {
@@ -83,8 +113,9 @@ void processMessage(Message* message) {
             break;
         case FLASH:
             leds[message->id] = message->color;
-            leds[message->id] += CRGB(message->percentage, message->percentage, message->percentage);
+            // CRGB addition with FastLED does NOT overflow
             Serial.println("[State] FLASH -> led id: ");
+            leds[message->id] += CRGB(message->percentage, message->percentage, message->percentage); 
             Serial.println(message->id);
             break;
     }
